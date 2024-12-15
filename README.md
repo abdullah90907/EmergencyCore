@@ -2,6 +2,13 @@
 
 ## 🌟 Overview
 
+### 💻 Technologies Used
+
+- **Streamlit**: For building the interactive web interface.
+- **Hugging Face Transformers**: For powerful NLP tasks like report classification.
+- **YOLOv5**: For real-time damage detection in images.
+- **PyTorch**: Deep learning framework for implementing machine learning models.
+
 **EmergencyCore** is a cutting-edge AI-driven platform designed to revolutionize disaster management. Leveraging advanced technology, it analyzes citizen reports, assesses damage from images, and provides real-time emergency forecasting to enhance response efforts during natural and man-made disasters.
 
 ## 🛠️ Features
