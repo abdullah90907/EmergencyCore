@@ -22,10 +22,9 @@
 
 ### 💻 Technologies Used
 
-- **Streamlit**: For building the interactive web interface.
-- **Hugging Face Transformers**: For powerful NLP tasks like report classification.
-- **YOLOv5**: For real-time damage detection in images.
-- **PyTorch**: Deep learning framework for implementing machine learning models.
+- **Gradio**: For building the interactive web interface.
+- **Hugging Face Transformers**: For deployment the app.
+- **Grok xAi**: For real-time damage detection in images.
 
 ### 📝 License
 
