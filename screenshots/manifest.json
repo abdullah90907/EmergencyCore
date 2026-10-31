@@ -1,0 +1,89 @@
+{
+  "project": "EmergencyCore 2.0",
+  "captured_at": "2026-10-31T13:47:02.962720+00:00",
+  "database": "isolated demonstration copy; production incidents unchanged",
+  "map_capture": "External OSM tile requests blocked; real cached road overlays shown.",
+  "limitations": [
+    "No authentic damage-photo assessment result captured; vision interface state only.",
+    "No claimed satellite damage inference or verified historical road damage.",
+    "Backend-only APIs do not have dedicated UI screenshots."
+  ],
+  "screenshots": [
+    {
+      "file": "01-overview.png",
+      "description": "Operations overview with explicitly labelled demonstration reports in an isolated database."
+    },
+    {
+      "file": "02-incident-desk.png",
+      "description": "Incident queue, search and status filtering."
+    },
+    {
+      "file": "03-incident-search.png",
+      "description": "Search narrows the incident queue."
+    },
+    {
+      "file": "04-report-form.png",
+      "description": "New report form with urgency and optional paired coordinates."
+    },
+    {
+      "file": "05-report-analysis.png",
+      "description": "Persisted report details, model analysis, advisory and review actions."
+    },
+    {
+      "file": "06-status-workflow.png",
+      "description": "Operator advances an isolated demonstration report to verified."
+    },
+    {
+      "file": "07-related-reports.png",
+      "description": "Local semantic similarity candidates, without automatic merging."
+    },
+    {
+      "file": "08-ai-and-vision-workspace.png",
+      "description": "Text analysis and optional image-upload interface; no structural-damage inference is demonstrated."
+    },
+    {
+      "file": "09-groq-text-result.png",
+      "description": "Real hosted Groq advisory and local semantic scores for an explicitly labelled test scenario."
+    },
+    {
+      "file": "10-weather-input.png",
+      "description": "Coordinate-based weather lookup."
+    },
+    {
+      "file": "11-weather-result.png",
+      "description": "Real Open-Meteo response with provider time, units and attribution."
+    },
+    {
+      "file": "12-road-network.png",
+      "description": "Cached real Anchorage driving network; external basemap disabled for automated capture."
+    },
+    {
+      "file": "13-routing-comparison.png",
+      "description": "Actual OSM graph with an explicitly simulated closure, endpoint pins and baseline/adapted comparison."
+    },
+    {
+      "file": "14-historical-replay.png",
+      "description": "Replay before the simulated closure: zero excluded edges and zero added delay."
+    },
+    {
+      "file": "15-region-unavailable.png",
+      "description": "Explicit unprepared-region state; unsafe/unavailable operations disabled."
+    },
+    {
+      "file": "16-connection-settings.png",
+      "description": "Connection settings with an empty token field; no credentials are captured."
+    },
+    {
+      "file": "17-mobile-overview.png",
+      "description": "Responsive mobile dashboard."
+    },
+    {
+      "file": "18-mobile-navigation.png",
+      "description": "Mobile navigation and creator links remain available."
+    },
+    {
+      "file": "19-mobile-routing.png",
+      "description": "Mobile routing workspace with refitted route bounds."
+    }
+  ]
+}
