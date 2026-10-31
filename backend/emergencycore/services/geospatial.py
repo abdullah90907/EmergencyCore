@@ -3,7 +3,7 @@ from pyproj import Transformer
 from shapely.geometry import LineString, Point, mapping, shape
 from shapely import transform as transform_geometry
 from werkzeug.exceptions import NotFound
-from .regions import data_path, get_region, load_network
+from .regions import data_path, get_region, load_network, dataset
 from .common import point
 
 
@@ -20,10 +20,10 @@ def edge_shape(edge, nodes):
 
 
 def assets(region_id):
-    path = data_path(region_id, 'assets.geojson')
-    if not path.exists():
+    raw = dataset(region_id, 'assets')
+    if raw is None:
         return {'type': 'FeatureCollection', 'features': [], 'notice': 'Asset layer not downloaded'}
-    return json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(raw)
 
 
 def nearest_edge(region_id, coordinates, max_distance=100):

@@ -8,8 +8,12 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_config():
+    load_dotenv(BACKEND_ROOT.parent / '.env.local')
+    load_dotenv(BACKEND_ROOT.parent / '.env')
     load_dotenv(BACKEND_ROOT / '.env')
     config = {key: os.getenv(key, default) for key, default in {
+        'DATABASE_URL': os.getenv('POSTGRES_URL', ''),
+        'DATABASE_URL_UNPOOLED': os.getenv('POSTGRES_URL_NON_POOLING', ''),
         'DATABASE_PATH': str(BACKEND_ROOT / 'instance' / 'emergencycore.sqlite3'),
         'AI_PROVIDER': 'none', 'AI_BASE_URL': 'https://router.huggingface.co/v1',
         'AI_MODEL': '', 'AI_VISION_MODEL': '', 'AI_API_KEY': '', 'API_TOKEN': '',
@@ -51,4 +55,5 @@ def load_config():
     geo_path = Path(config['GEO_DATA_DIR'])
     config['GEO_DATA_DIR'] = str(geo_path if geo_path.is_absolute() else BACKEND_ROOT / geo_path)
     config['MAX_CONTENT_LENGTH'] = 6 * 1024 * 1024
+    config['APP_ENV'] = os.getenv('APP_ENV', 'development')
     return config

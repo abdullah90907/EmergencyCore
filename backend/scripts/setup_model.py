@@ -8,8 +8,9 @@ from huggingface_hub import hf_hub_download, model_info
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from emergencycore.services.semantic import MODEL_ID, get_model
+from emergencycore.config import load_config
 
-destination = ROOT / 'models' / 'minilm'
+destination = Path(load_config()['LOCAL_MODEL_DIR'])
 destination.mkdir(parents=True, exist_ok=True)
 revision = model_info(MODEL_ID).sha
 manifest = {'model': MODEL_ID, 'revision': revision, 'files': {}}

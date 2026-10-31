@@ -1,12 +1,15 @@
 """Additive, transactional schema migrations preserving the original tables."""
-from .database import connect
+from .database import connect, run_schema
 from contextlib import closing
 
 
 def migrate(app):
-    with app.app_context(), closing(connect()) as db:
-        db.executescript('''BEGIN IMMEDIATE;
+    with app.app_context(), closing(connect(migrations=True)) as db:
+        run_schema(db, '''
         CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER PRIMARY KEY, applied_at TEXT);
+        CREATE TABLE IF NOT EXISTS region_datasets(
+            region_id TEXT NOT NULL, layer TEXT NOT NULL, payload TEXT NOT NULL,
+            updated_at TEXT NOT NULL, PRIMARY KEY(region_id,layer));
         CREATE TABLE IF NOT EXISTS disasters(
             id TEXT PRIMARY KEY, source TEXT NOT NULL, kind TEXT NOT NULL, mode TEXT NOT NULL,
             title TEXT NOT NULL, occurred_at TEXT NOT NULL, fetched_at TEXT NOT NULL,
@@ -30,5 +33,5 @@ def migrate(app):
             payload TEXT NOT NULL, FOREIGN KEY(scenario_id) REFERENCES scenarios(id));
         CREATE TABLE IF NOT EXISTS traffic_snapshots(
             source_id TEXT PRIMARY KEY, fetched_at TEXT NOT NULL, payload TEXT NOT NULL);
-        INSERT OR IGNORE INTO schema_versions VALUES(1,strftime('%Y-%m-%dT%H:%M:%fZ','now'));
-        COMMIT;''')
+        INSERT INTO schema_versions VALUES(1,CURRENT_TIMESTAMP) ON CONFLICT(version) DO NOTHING;
+        ''')

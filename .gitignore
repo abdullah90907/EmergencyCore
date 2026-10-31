@@ -20,4 +20,15 @@ backend/data/
 
 # Isolated publication checkout
 .publication/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.db-wal
+*.db-shm
 
+.neon
+node_modules/
+
+# Root Neon tool dependencies
+/node_modules/

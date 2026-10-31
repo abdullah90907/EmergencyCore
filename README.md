@@ -1,3 +1,5 @@
+> **Neon migration update:** production now requires DATABASE_URL. Incident/event/scenario/routing data and prepared region datasets persist in Neon; Render no longer needs a persistent disk. Existing local SQLite records have NOT been copied. See [Neon verification](docs/NEON.md).
+
 # EmergencyCore 2.0
 
 ### AI-assisted disaster intelligence, infrastructure simulation, and adaptive routing
@@ -56,7 +58,7 @@ flowchart TD
     Browser[React 19 + Tailwind CSS 4 + MapLibre]
     Vite[Vite development API proxy]
     Flask[Flask REST API / Waitress]
-    DB[(SQLite WAL)]
+    DB[(PostgreSQL on Neon (production), SQLite WAL (local development))]
     Rules[Keyword urgency rules]
     Local[MiniLM / Tokenizers / ONNX Runtime]
     Groq[Groq Qwen 3.8 text and vision]
@@ -93,7 +95,7 @@ The Vite proxy is for development. A production reverse proxy must route `/api` 
 ### Backend and storage
 
 - **Flask application factory** separates configuration, database setup, additive migrations, routes and services.
-- **SQLite WAL** stores incidents, events, normalized disasters, ingestion health, scenarios, observations, traffic snapshots and route results. New schema is added without replacing original incident tables.
+- **PostgreSQL on Neon (production), SQLite WAL (local development)** stores incidents, events, normalized disasters, ingestion health, scenarios, observations, traffic snapshots and route results. New schema is added without replacing original incident tables.
 - **Waitress** serves Flask on Windows. Long-lived SSE connections occupy worker threads; larger deployments need dedicated streaming capacity.
 - **NetworkX MultiDiGraph** preserves direction and parallel road edges. Baseline and adapted paths use modeled travel-time weights; blocked/unavailable directed edges are excluded from adapted routing.
 - **Shapely/PyProj** perform metric distance matching and geometric intersections. **OSMnx/GeoPandas** prepare regional road/building/facility datasets outside normal requests.
@@ -279,7 +281,7 @@ Production build separates the initial interface (~270 kB JavaScript in the docu
 .\.venv\Scripts\python.exe -m waitress --listen=127.0.0.1:5000 --threads=8 app:app
 ```
 
-Serve `frontend/dist` through a web server, reverse-proxy `/api` to Flask, and keep all credentials server-side. SQLite and threaded SSE suit a small single-host pilot. Multiple instances need shared persistence and an event broker. Public multiuser operation additionally needs per-user authentication/roles, rate limits, TLS, retention/consent controls, monitoring and backups.
+Serve `frontend/dist` through a web server, reverse-proxy `/api` to Flask, and keep all credentials server-side. Production persistence uses Neon PostgreSQL. SQLite remains local-only. Threaded SSE still needs dedicated streaming capacity as concurrency grows. Public multiuser operation additionally needs per-user authentication/roles, rate limits, TLS, retention/consent controls, monitoring and backups.
 
 The default geographic background uses attributed OpenStreetMap raster tiles. Configure `VITE_BASEMAP_TILE_URL` for an appropriate alternative provider; update attribution in the map source when changing providers. Follow the [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/); do not bulk-download or prefetch tiles.
 
@@ -303,3 +305,8 @@ The default geographic background uses attributed OpenStreetMap raster tiles. Co
 - GitHub: [abdullah90907](https://github.com/abdullah90907)
 
 These links also appear in the application footer. The repository currently has no root LICENSE file; no blanket licence grant for the project is asserted here. External models, datasets, libraries and tiles retain their respective terms and attribution requirements.
+
+## Render + Vercel deployment
+
+See [the deployment guide](docs/DEPLOYMENT.md) for Neon PostgreSQL, diskless Render setup, Vercel API-origin configuration, authentication, data preparation and live acceptance checks. The root render.yaml and frontend/vercel.json are prepared; cloud resources have not been deployed automatically.
+

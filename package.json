@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@neon/config": "^1.10.0",
+    "@neon/env": "^1.6.8"
+  },
+  "name": "emergencycore-2",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run dev",
+    "neon:deploy": "npx neon@latest deploy",
+    "setup": "npm --prefix frontend ci"
+  },
+  "engines": {
+    "node": ">=22.20.0"
+  }
+}

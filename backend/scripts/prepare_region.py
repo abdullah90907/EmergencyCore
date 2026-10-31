@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from emergencycore import create_app
-from emergencycore.services.regions import get_region, data_path
+from emergencycore.services.regions import get_region, data_path, persist_dataset
 from emergencycore.services.common import now
 
 
@@ -22,7 +22,7 @@ def main():
     app = create_app()
     with app.app_context():
         region = get_region(args.region)
-        ox.settings.cache_folder = str(ROOT / 'data' / 'osm-cache')
+        ox.settings.cache_folder = str(Path(app.config['GEO_DATA_DIR']) / 'osm-cache')
         ox.settings.requests_timeout = 180
         ox.settings.use_cache = True
         ox.settings.http_user_agent = 'EmergencyCore-local-research/2.0'
@@ -53,6 +53,7 @@ def main():
             print(json.dumps({'region': args.region, 'nodes': len(nodes), 'edges': len(edges), 'saved_to': str(destination)}))
         else:
             print(json.dumps({'region': args.region, 'roads': 'reusing cached snapshot'}))
+        persist_dataset(args.region, 'roads')
         if args.assets:
             frame = ox.features_from_bbox(tuple(region['bbox']), tags={'building': True, 'amenity': ['hospital', 'fire_station', 'police']})
             features = []
@@ -68,6 +69,7 @@ def main():
                 'source': 'OpenStreetMap contributors', 'fetched_at': now(),
                 'notice': 'Mapped facilities and buildings; operational status and completeness are unknown.'}), encoding='utf-8')
             temporary.replace(target)
+            persist_dataset(args.region, 'assets')
             print(json.dumps({'assets': len(features), 'saved_to': str(target)}))
 
 
