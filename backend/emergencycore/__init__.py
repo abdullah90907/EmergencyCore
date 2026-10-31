@@ -1,0 +1,19 @@
+from flask import Flask
+from .config import load_config
+from .database import init_database
+from .api.routes import register_routes
+from .migrations import migrate
+from .api.intelligence import intelligence
+
+def create_app(overrides=None):
+    app = Flask(__name__)
+    app.config.update(load_config())
+    if overrides:
+        app.config.update(overrides)
+    if app.config['AI_PROVIDER'] not in {'none', 'groq', 'huggingface', 'compatible'}:
+        raise ValueError('Unsupported AI_PROVIDER')
+    init_database(app)
+    migrate(app)
+    register_routes(app)
+    app.register_blueprint(intelligence, url_prefix='/api/v1')
+    return app

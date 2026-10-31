@@ -1,5 +1,1 @@
-gradio
-pandas
-scikit-learn
-joblib
-numpy
+-r backend/requirements.txt
