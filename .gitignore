@@ -1,0 +1,23 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+instance/
+
+backend/models/
+backend/instance/
+frontend/node_modules/
+frontend/dist/
+frontend/.qa/
+backend/data/
+
+
+# Private environment files at any depth; templates stay shareable.
+.env.*
+!.env.example
+!**/.env.example
+
+
+# Isolated publication checkout
+.publication/
+
