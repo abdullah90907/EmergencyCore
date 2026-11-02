@@ -25,3 +25,14 @@
 
 .project-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid #e2e6e5;margin-top:30px;padding:22px 0 4px;color:#7d8f99;font-size:11px}.project-footer>div{display:flex;flex-direction:column;gap:6px}.project-footer strong{color:#486477;font-weight:600}.project-footer nav{display:flex;gap:20px;flex-wrap:wrap}.project-footer a{display:flex;align-items:center;gap:4px}.project-footer a:hover{color:#dc714e}@media(max-width:640px){.project-footer{gap:18px}.project-footer nav{gap:16px}}
 
+
+/* Metric availability is explicit; placeholders never imply report counts. */
+.metric-pending{min-height:90px;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:12px 0}
+.metric-skeleton{display:block;width:88px;height:32px;border-radius:9px;background:linear-gradient(100deg,#eaf0f5 20%,#f8fbfd 45%,#eaf0f5 70%);background-size:240% 100%;animation:metric-shimmer 1.8s ease-in-out infinite}
+.metric-loading{display:flex;align-items:center;gap:7px;font-size:11px;color:#637e94}
+.metric-offline{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px}
+.metric-state-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#edf4fa;color:#5e87a6;flex-shrink:0}
+.metric-offline>div{display:flex;flex-direction:column;gap:5px}.metric-offline b{font-size:15px;font-weight:600;color:#425c73}.metric-offline>div>span{font-size:10px;color:#7c8d9b}
+@keyframes metric-shimmer{to{background-position:-240% 0}}
+@media(prefers-reduced-motion:reduce){.metric-skeleton{animation:none}}
+@media(max-width:640px){.metric-pending{min-height:78px}.metric-offline{gap:7px}.metric-state-icon{width:29px;height:32px}.metric-offline b{font-size:12px}.metric-offline>div>span{font-size:9px}}
