@@ -1,4 +1,3 @@
-import { getToken, isRemembered, saveToken, forgetToken } from './connection';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Activity, ArrowDown, ArrowRight, ArrowUpRight, Bell, Check, ChevronDown, ChevronRight, CircleHelp, CloudSun, Cpu, FileText, Flame, Globe2, Layers3, LayoutDashboard, Loader2, MapPin, Menu, Plus, Radio, RefreshCw, Search, Settings2, ShieldCheck, Sparkles, Upload, Waves, Wind, X, Zap, Eye, Thermometer, AlertTriangle } from 'lucide-react';
 import { api } from './api';
@@ -27,7 +26,6 @@ export default function App() {
   const [updated, setUpdated] = useState(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [settings, setSettings] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
@@ -57,13 +55,13 @@ export default function App() {
       <div className="nav-label">WORKSPACE</div>
       <nav>{nav.map(({ id, label, icon: Icon }) => <button key={id} aria-label={label} className={`nav-item ${page === id ? 'active' : ''}`} onClick={() => go(id)}><Icon size={19}/><span>{label}</span>{id === 'incidents' && metrics?.active > 0 && <span className="nav-count">{metrics.active}</span>}{page === id && <span className="nav-active-dot"/>}</button>)}</nav>
       <div className="sidebar-note"><span className="note-icon"><ShieldCheck size={22}/></span><h4>Technology with purpose.</h4><p>Better context for the people making critical decisions.</p><span className="mini-label">ALWAYS HUMAN-REVIEWED <ArrowUpRight size={12}/></span></div>
-      <div className="sidebar-bottom"><button onClick={() => setSettings(true)}><Settings2 size={18}/>Connection settings</button><button onClick={() => { setToast('For immediate danger, contact your local emergency services. Reports in this workspace do not dispatch responders.'); }}><CircleHelp size={18}/>Workspace guidance</button><div className="operator"><span className="operator-avatar">OP</span><div>Response operator<small>Local workspace</small></div><span className="status-dot"/></div></div>
+      <div className="sidebar-bottom"><button onClick={() => { setToast('For immediate danger, contact your local emergency services. Reports in this workspace do not dispatch responders.'); }}><CircleHelp size={18}/>Workspace guidance</button><div className="operator"><span className="operator-avatar">OP</span><div>Response operator<small>Local workspace</small></div><span className="status-dot"/></div></div>
     </aside>
     <div className="main-shell">
       <header className="topbar"><div className="flex items-center gap-3"><button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setMobile(true)}><Menu size={20}/></button><span className="breadcrumb">Workspace <ChevronRight size={13}/> <strong>{nav.find(n => n.id === page)?.label}</strong></span></div><div className="topbar-right"><span className={`connection ${error ? 'offline' : ''}`}><span className="status-dot"/>{loading ? 'Connecting' : error ? 'Disconnected' : 'Backend connected'}</span><span className="topbar-divider"/><button className="icon-button" aria-label="Refresh workspace" onClick={() => refresh(true)}><RefreshCw size={17} className={loading ? 'animate-spin' : ''}/></button><button className="icon-button" aria-label="Show workspace activity" onClick={() => { go('incidents'); setFilter('reported'); }}><Bell size={19}/>{reports.some(r => r.status === 'reported') && <span className="notification-dot"/>}</button><span className="top-avatar">OP</span></div></header>
       <main>
         <div className="page-heading"><div><div className="eyebrow"><span/> SITUATIONAL AWARENESS, SIMPLIFIED</div><h1>{titles[page]}</h1><p>{page === 'overview' ? 'A clearer picture. A more considered response.' : page === 'incidents' ? 'Review the details. Connect the signals. Coordinate the next step.' : page === 'intelligence' ? 'Explore local model insights with human judgment at the center.' : page === 'disasters' ? 'Explore real road data, inspect evidence, and compare a simulated disruption.' : 'Current conditions and hourly forecasts, in one place.'}</p></div><button className="button primary" onClick={() => setReportOpen(true)}><Plus size={17}/>New report</button></div>
-        <ErrorBox message={error ? `${error}. Check that the Flask backend is running, or update your connection settings.` : ''}/>
+        <ErrorBox message={error ? `${error}. The service may be starting. Retry shortly; contact the administrator if this continues.` : ''}/>
         {page === 'overview' && <>
           <section className="hero"><div className="hero-grid"/><div className="hero-copy"><span className="hero-kicker"><span className="small-pulse"/> THE RESPONSE STARTS WITH AWARENESS</span><h2>Clarity in the chaos.<br/><span>Care in every response.</span></h2><p>Bring reports, local intelligence, and changing conditions into one calm, connected workspace.</p><button className="button hero-button" onClick={() => go('incidents')}>Open incident desk <ArrowUpRight size={17}/></button><span className="hero-footnote"><ShieldCheck size={14}/> Decision support. Always human-led.</span></div><Beacon/></section>
           <section className="metrics-grid" aria-label="Incident statistics">{[
@@ -84,7 +82,6 @@ export default function App() {
     </div>
     {reportOpen && <ReportModal onClose={() => setReportOpen(false)} onCreated={item => { setReportOpen(false); refresh(); setSelected(item); setToast('Report saved. Ready for human review.'); }}/ >}
     {selected && <IncidentDrawer item={selected} onClose={() => setSelected(null)} onUpdated={item => { setSelected(item); refresh(); }}/ >}
-    {settings && <Settings onClose={() => setSettings(false)} onSave={() => { setSettings(false); refresh(true); }}/ >}
     {toast && <div className="toast" role="status"><ShieldCheck size={20}/><span>{toast}</span><button className="icon-button" aria-label="Dismiss message" onClick={() => setToast('')}><X size={16}/></button></div>}
   </div>;
 }
@@ -135,18 +132,3 @@ function Weather() {
   const current = weather?.current; const units = weather?.current_units;
   return <div className="weather-layout"><section className="panel padded"><span className="stat-icon orange"><Globe2 size={23}/></span><h2 className="feature-title mt-6">A view of what’s outside.</h2><p className="muted">Check current modeled conditions and hourly precipitation probability at a precise location.</p><form className="form-stack mt-6" onSubmit={load}><div className="form-grid"><label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" defaultValue="24.8607" required/></label><label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" defaultValue="67.0011" required/></label></div><p className="small-note">Starting coordinates: Karachi. Change them to check another location.</p><button className="button primary" disabled={busy}>{busy ? <Spinner/> : <CloudSun size={18}/>} {busy ? 'Checking conditions…' : 'Check weather'}<ArrowUpRight size={16}/></button></form><ErrorBox message={error}/><div className="info-box mt-6"><CircleHelp size={19}/><p>Open-Meteo weather model data, not official emergency alerts or flood predictions. Conditions can differ from on-site observations.</p></div></section><section className="panel weather-result">{current ? <><div className="weather-result-top"><div className="section-kicker">CURRENT CONDITIONS · UTC</div><span className="sun-illustration"><CloudSun size={74} strokeWidth={1.2}/></span><h2>{current.temperature_2m}<span>{units.temperature_2m}</span></h2><p>{weather.latitude.toFixed(3)}°, {weather.longitude.toFixed(3)}°</p><small>Provider time: {current.time.replace('T', ' ')} UTC</small></div><div className="weather-details"><div><Wind size={19}/><span>Wind speed</span><strong>{current.wind_speed_10m} {units.wind_speed_10m}</strong></div><div><Waves size={19}/><span>Precipitation</span><strong>{current.precipitation} {units.precipitation}</strong></div></div><div className="forecast"><h4>Hourly rain probability</h4><div className="forecast-bars">{weather.hourly.time.map((time, index) => ({ time, index })).filter(({ time }) => time >= current.time.slice(0, 13) + ':00').slice(0, 8).map(({ time, index }) => <div key={time}><span>{weather.hourly.precipitation_probability[index] ?? '—'}%</span><div className="forecast-track"><div style={{ height: `${weather.hourly.precipitation_probability[index] || 0}%` }}/></div><small>{time.slice(11, 16)}</small></div>)}</div></div><a className="weather-attribution" href="https://open-meteo.com/" target="_blank" rel="noreferrer">Weather data by Open-Meteo <ArrowUpRight size={12}/></a></> : <Empty title="The outlook starts here." text="Choose coordinates to see current conditions and the hourly outlook."/>}</section></div>;
 }
-
-function Settings({ onClose, onSave }) {
-  const [token, setToken] = useState(getToken);
-  const [remember, setRemember] = useState(isRemembered);
-  return <Modal title="Connect your workspace." subtitle="Configure access to your EmergencyCore backend." onClose={onClose}>
-    <form className="form-stack" onSubmit={e => { e.preventDefault(); saveToken(token, remember); onSave(); }}>
-      <label>Operator API token <span className="optional">provided by your workspace administrator</span><input type="password" autoComplete="off" value={token} onChange={e => setToken(e.target.value)} placeholder="Enter backend API token"/></label>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}><input style={{ width: 'auto' }} type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)}/>Remember on this trusted device</label>
-      <div className="info-box"><ShieldCheck size={18}/><p>{remember ? 'Access will be remembered across browser restarts. Only enable this on your own trusted device. Forget the connection before sharing this browser.' : 'Access lasts for this browser tab. Enable remember to avoid entering your token again on future visits.'}</p></div>
-      <button className="button primary justify-center">Save connection <ArrowRight size={16}/></button>
-      <button type="button" className="button justify-center" onClick={() => { forgetToken(); setToken(''); setRemember(false); onSave(); }}>Forget connection</button>
-    </form>
-  </Modal>;
-}
-

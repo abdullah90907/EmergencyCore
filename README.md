@@ -328,3 +328,10 @@ Production uses Neon PostgreSQL; SQLite remains for local development. Region sn
 ## Context for coding assistants
 
 Read [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), then the relevant source and tests. This README documents implementation; it is not automatically sent to the hosted advisory model. Documentation changes do not change inference instructions. Provider model IDs are configurable defaults, not proof of current model availability.
+
+
+## Server-side connection (current implementation)
+
+The token entry UI and browser token storage have been removed. Browser requests use same-origin /api/v1; a Vercel Node function forwards them to Render with server-only credentials. Set BACKEND_API_URL=https://emergencycore-api.onrender.com and API_TOKEN in Vercel. API_TOKEN must match Render's API_TOKEN. Do not use VITE_API_BASE_URL or VITE_API_TOKEN. Redeploy Vercel after changing environment settings. Local Vite development still proxies directly to Flask; leave local API_TOKEN empty for development.
+
+This supersedes earlier manual connection instructions above. Visitors to the deployed app share workspace access; the proxy hides credentials but does not implement user accounts or authorization. Use Vercel deployment protection if the workspace should be private. A token configured only on Render cannot authenticate a separate Vercel server without a matching server-side credential.

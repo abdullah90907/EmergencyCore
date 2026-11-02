@@ -61,3 +61,10 @@ Use Neon backups/restore facilities or `pg_dump` with the **direct** connection 
 Existing local SQLite records were not exported to Neon. That transfer is a separate operator decision. Production has the schema and prepared public road data; verification records were synthetic and cleaned up.
 
 This is an access-controlled pilot, not public multiuser emergency infrastructure. Per-user roles, rate limiting, monitoring, retention policies and validated operational data remain necessary before broader operation. Candidate routes are not safety guarantees.
+
+
+## Server-side connection (current implementation)
+
+The token entry UI and browser token storage have been removed. Browser requests use same-origin /api/v1; a Vercel Node function forwards them to Render with server-only credentials. Set BACKEND_API_URL=https://emergencycore-api.onrender.com and API_TOKEN in Vercel. API_TOKEN must match Render's API_TOKEN. Do not use VITE_API_BASE_URL or VITE_API_TOKEN. Redeploy Vercel after changing environment settings. Local Vite development still proxies directly to Flask; leave local API_TOKEN empty for development.
+
+This supersedes earlier manual connection instructions above. Visitors to the deployed app share workspace access; the proxy hides credentials but does not implement user accounts or authorization. Use Vercel deployment protection if the workspace should be private. A token configured only on Render cannot authenticate a separate Vercel server without a matching server-side credential.

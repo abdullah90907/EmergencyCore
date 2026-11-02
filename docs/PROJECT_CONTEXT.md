@@ -27,3 +27,10 @@ Shared operator bearer authentication is implemented. Individual accounts, roles
 Run npm run build from root. Run python -m unittest discover -s backend/tests -v using the configured Python environment; model-dependent tests need downloaded weights. Read backend/scripts/verify_neon.py before running: it writes temporary verification records to the configured database. Do not export private local incidents without authorization.
 
 Consult docs/DEPLOYMENT.md and docs/NEON.md. Do not commit secrets, env files, model weights or private databases. Screenshots document a capture, not current provider health.
+
+
+## Server-side connection (current implementation)
+
+The token entry UI and browser token storage have been removed. Browser requests use same-origin /api/v1; a Vercel Node function forwards them to Render with server-only credentials. Set BACKEND_API_URL=https://emergencycore-api.onrender.com and API_TOKEN in Vercel. API_TOKEN must match Render's API_TOKEN. Do not use VITE_API_BASE_URL or VITE_API_TOKEN. Redeploy Vercel after changing environment settings. Local Vite development still proxies directly to Flask; leave local API_TOKEN empty for development.
+
+This supersedes earlier manual connection instructions above. Visitors to the deployed app share workspace access; the proxy hides credentials but does not implement user accounts or authorization. Use Vercel deployment protection if the workspace should be private. A token configured only on Render cannot authenticate a separate Vercel server without a matching server-side credential.
