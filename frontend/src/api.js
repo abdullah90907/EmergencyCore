@@ -1,9 +1,10 @@
+import { getToken } from './connection';
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 export async function api(path, options = {}) {
   if (import.meta.env.PROD && !API_BASE) throw new Error('Deployment configuration missing: set VITE_API_BASE_URL to the HTTPS backend origin and rebuild');
   const headers = { ...options.headers };
-  const token = sessionStorage.getItem('ec-token');
+  const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (options.body && !(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
   const response = await fetch(`${API_BASE}/api/v1${path}`, { ...options, headers, signal: options.signal || AbortSignal.timeout(60000) });
