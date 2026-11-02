@@ -68,7 +68,8 @@ flowchart TD
     Worker[Separate ingestion worker]
     Providers[USGS / NWS / Alaska 511]
     Weather[Open-Meteo]
-    Browser --> Vite --> Flask
+    Browser -->|development| Vite --> Flask
+    Browser -->|production HTTPS| Flask
     Flask --> DB
     Flask --> Rules
     Flask --> Local
@@ -81,7 +82,7 @@ flowchart TD
     DB --> Events[Persistent event history / SSE endpoint]
 ```
 
-The Vite proxy is for development. A production reverse proxy must route `/api` to Flask and serve the built frontend. All hosted-model credentials remain on the backend.
+The Vite proxy is for development. In the Vercel/Render deployment, the browser calls Render directly using VITE_API_BASE_URL and Render permits the frontend origin using CORS_ORIGIN. All hosted-model credentials remain on the backend.
 
 ### Frontend
 
@@ -90,7 +91,7 @@ The Vite proxy is for development. A production reverse proxy must route `/api` 
 - **MapLibre GL** renders an attributed geographic basemap and cached GeoJSON overlays. Its web worker is bundled explicitly through Vite.
 - The map workspace is **lazy-loaded** instead of shipping its full JavaScript with the initial dashboard.
 - Region changes cancel obsolete road requests and clear scenario results, endpoints and selected edges. Missing data disables unsupported operations rather than leaving stale geometry on screen.
-- Optional operator authentication uses a token held in tab-scoped session storage. The UI is intended for a trusted local operator, not public authentication for multiple users.
+- Operator bearer access supports tab-only storage or explicit opt-in persistence on a trusted device, scoped to the backend origin. Forget connection clears both stores. Individual accounts and roles are not implemented.
 
 ### Backend and storage
 
@@ -269,7 +270,7 @@ See [detailed contracts and payload examples](docs/BACKEND_2_IMPLEMENTATION.md) 
 npm --prefix frontend run build
 ```
 
-The last documented backend regression run passed **25 tests**, including real local-model inference when weights are present. Provider failover tests use mocks; they do not prove live Gemini reliability. Groq text/image calls and Alaska 511 were separately verified live; full AI-form and weather responses are demonstrated in the screenshot walkthrough.
+The last documented backend regression run passed **30 tests** locally (29 passed and one model-dependent test skipped in the clean publication checkout), including real local-model inference when weights are present. Provider failover tests use mocks; they do not prove live Gemini reliability. Groq text/image calls and Alaska 511 were separately verified live; full AI-form and weather responses are demonstrated in the screenshot walkthrough.
 
 Map browser checks cover missing-region controls, clearing stale markers/results, rapid region switching, replay recalculation, short-height sidebar scrolling, and phone-width overflow. See [verification details](docs/VERIFICATION.md). Public basemap tile requests are blocked in automated map captures; screenshot maps are cached overlays, not proof of external tile availability.
 
@@ -308,5 +309,22 @@ These links also appear in the application footer. The repository currently has 
 
 ## Render + Vercel deployment
 
-See [the deployment guide](docs/DEPLOYMENT.md) for Neon PostgreSQL, diskless Render setup, Vercel API-origin configuration, authentication, data preparation and live acceptance checks. The root render.yaml and frontend/vercel.json are prepared; cloud resources have not been deployed automatically.
+See [the deployment guide](docs/DEPLOYMENT.md) for Neon PostgreSQL, diskless Render setup, Vercel API-origin configuration, authentication, data preparation and live acceptance checks. The root render.yaml and frontend/vercel.json are prepared; the backend deployment target is https://emergencycore-api.onrender.com; current availability must be checked independently.
 
+
+## Current deployment and access configuration
+
+| Host | Settings |
+|---|---|
+| Render | Root `backend`; build `pip install -r requirements-models.txt -r requirements-geo.txt && python scripts/setup_model.py`; start `python serve.py` |
+| Render environment | `APP_ENV=production`, Neon pooled `DATABASE_URL`, direct `DATABASE_URL_UNPOOLED` for maintenance, strong `API_TOKEN`, exact frontend `CORS_ORIGIN`, required provider keys |
+| Vercel | Root `frontend`; Vite; Node 22.x; install `npm ci`; build `npm run build`; output `dist` |
+| Vercel environment | `VITE_API_BASE_URL=https://emergencycore-api.onrender.com` without `/api/v1`; optional public `VITE_BASEMAP_TILE_URL` |
+
+Never put database credentials, AI keys or API_TOKEN in VITE variables. Operators obtain the token privately from the administrator and enter it in Connection settings. Remember on this trusted device is optional and uses local storage; scripts running on the same origin can read it. Tab-only access is appropriate for shared devices. Forget connection clears both stores. Token rotation or clearing browser storage requires reconnecting. This is shared operator access, not individual user authentication.
+
+Production uses Neon PostgreSQL; SQLite remains for local development. Region snapshots persist in region_datasets and can restore temporary filesystem caches. Model weights download during the build. Ingestion requires manual refresh or a separate worker. Incident UI updates use polling; frontend SSE subscription remains pending.
+
+## Context for coding assistants
+
+Read [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), then the relevant source and tests. This README documents implementation; it is not automatically sent to the hosted advisory model. Documentation changes do not change inference instructions. Provider model IDs are configurable defaults, not proof of current model availability.
